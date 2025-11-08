@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    // --- THIS IS THE FIX ---
+    // 1. This tells TypeScript this file is part of a "composite" project.
+    "composite": true,
+    // 2. We remove "noEmit" (which fixes the second error).
+    // -----------------------
+
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["vite.config.ts"] // Make sure this file exists
+}
