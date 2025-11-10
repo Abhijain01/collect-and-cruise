@@ -1,27 +1,30 @@
-// frontend/src/pages/CartPage.tsx
-
-import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { Helmet } from 'react-helmet-async';
 import { useCart } from '../context/CartContext';
-import { Trash } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { Trash2 } from 'lucide-react';
+// We'll use these components (which you have) for messages
+import Loader from '../components/Loader';
+import Message from '../components/Message';
 
-// --- STYLED COMPONENT DEFINITIONS ---
+// --- Styled Components ---
 const PageWrapper = styled.div`
   max-width: 1280px;
   margin: 0 auto;
-  padding: 4rem 1rem;
+  padding: 2rem 1rem;
+  background-color: var(--color-background);
 `;
 
 const Title = styled.h1`
   font-size: 2.25rem;
   font-weight: 700;
   color: var(--color-text);
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
 `;
 
 const CartGrid = styled.div`
-  margin-top: 2rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
@@ -30,19 +33,20 @@ const CartGrid = styled.div`
   }
 `;
 
-const CartItemList = styled.div`
+const CartItemsList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 `;
 
-const CartItem = styled.div`
+const CartItemCard = styled.div`
   display: flex;
-  gap: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+  gap: 1.5rem;
   padding: 1rem;
   background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  align-items: center;
 `;
 
 const ItemImage = styled.img`
@@ -54,80 +58,76 @@ const ItemImage = styled.img`
 
 const ItemInfo = styled.div`
   flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 `;
 
 const ItemName = styled(Link)`
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-text);
-  &:hover { text-decoration: underline; }
+  text-decoration: none;
+  &:hover {
+    color: var(--color-primary);
+  }
 `;
 
 const ItemPrice = styled.p`
+  font-size: 1rem;
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
-`;
-
-const ItemActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  margin-top: 0.25rem;
 `;
 
 const ItemQty = styled.p`
+  font-size: 1rem;
   font-weight: 500;
   color: var(--color-text);
+  margin-right: 1rem;
 `;
 
 const RemoveButton = styled.button`
   background: none;
   border: none;
-  color: #ef4444;
+  color: var(--color-text-secondary);
   cursor: pointer;
-  &:hover { color: #b91c1c; }
+  padding: 0.5rem;
+  border-radius: 99px;
+  &:hover {
+    color: var(--color-primary);
+    background-color: var(--color-border);
+  }
 `;
 
-const Summary = styled.div`
-  border: 1px solid var(--color-border);
-  border-radius: 0.5rem;
+const CartSummary = styled.div`
   padding: 1.5rem;
   background-color: var(--color-background-secondary);
-  height: fit-content;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  height: fit-content; // Makes it stick nicely
 `;
 
 const SummaryTitle = styled.h2`
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
   color: var(--color-text);
-  border-bottom: 1px solid var(--color-border);
-  padding-bottom: 0.75rem;
+  margin-bottom: 1.5rem;
 `;
 
 const SummaryRow = styled.div`
   display: flex;
   justify-content: space-between;
-  font-size: 1rem;
-  margin-top: 0.75rem;
-  color: var(--color-text-secondary);
-`;
-
-const SummaryTotal = styled(SummaryRow)`
   font-size: 1.125rem;
-  font-weight: 600;
-  color: var(--color-text);
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  margin-bottom: 1rem;
+  
+  span:last-child {
+    font-weight: 600;
+    color: var(--color-text);
+  }
 `;
 
 const CheckoutButton = styled.button`
-  display: block; 
-  text-align: center;
-  margin-top: 1.5rem;
   width: 100%;
   padding: 0.75rem 1rem;
+  margin-top: 1rem;
   border: none;
   border-radius: 0.375rem;
   background-color: var(--color-primary);
@@ -136,95 +136,102 @@ const CheckoutButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
-  &:hover { background-color: var(--color-primary-hover); }
+  
+  &:hover {
+    background-color: var(--color-primary-hover);
+  }
+  &:disabled {
+    background-color: var(--color-text-secondary);
+    cursor: not-allowed;
+  }
 `;
 
-const EmptyCartMessage = styled.div`
-  text-align: center;
-  padding: 4rem;
-  border: 1px dashed var(--color-border);
-  border-radius: 0.5rem;
-  background-color: var(--color-background-secondary);
-`;
+// --- COMPONENT ---
 
-// --- COMPONENT LOGIC ---
 const CartPage = () => {
-  const { cartItems, removeFromCart, loading } = useCart();
-  const { userInfo } = useAuth();
   const navigate = useNavigate();
+  // Get all cart functions and state from our "smart" context
+  const { cart, removeFromCart } = useCart();
+  const { cartItems, loading, error } = cart;
+
+  // Calculate totals
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.product.price * item.qty,
+    0
+  );
+  const totalItems = cartItems.reduce((acc, item) => acc + item.qty, 0);
+
+  const handleRemove = (id: string) => {
+    removeFromCart(id);
+  };
 
   const checkoutHandler = () => {
-    if (userInfo) {
-      navigate('/checkout');
-    } else {
-      navigate('/login?redirect=/checkout');
-    }
+    navigate('/checkout'); // We'll build this page next
   };
 
   if (loading) {
-    return <PageWrapper><Title>Loading Cart...</Title></PageWrapper>
+    return <PageWrapper><Loader /></PageWrapper>;
   }
   
-  const validCartItems = cartItems.filter(item => item.product);
-  const subtotal = validCartItems.reduce((acc, item) => acc + item.qty * item.product.price, 0);
-  const totalItems = validCartItems.reduce((acc, item) => acc + item.qty, 0);
+  if (error) {
+    return <PageWrapper><Message $error>{error}</Message></PageWrapper>;
+  }
 
   return (
     <>
-      <Helmet><title>Your Shopping Cart | Collect and Cruise</title></Helmet>
+      <Helmet>
+        <title>Shopping Cart | Collect and Cruise</title>
+      </Helmet>
       <PageWrapper>
-        <Title>Your Shopping Cart</Title>
-
-        {validCartItems.length === 0 ? (
-          <EmptyCartMessage>
-            <p>Your cart is empty.</p>
-            <Link to="/shop" style={{ color: 'var(--color-primary)', fontWeight: 500, marginTop: '1rem', display: 'inline-block' }}>
-              Go Shopping
-            </Link>
-          </EmptyCartMessage>
-        ) : (
-          <CartGrid>
-            <CartItemList>
-              {validCartItems.map(item => (
-                <CartItem key={item.product._id}>
+        <Title>Shopping Cart</Title>
+        <CartGrid>
+          <CartItemsList>
+            {cartItems.length === 0 ? (
+              <Message>
+                Your cart is empty. <Link to="/shop" style={{ textDecoration: 'underline' }}>Go Shopping</Link>
+              </Message>
+            ) : (
+              cartItems.map((item) => (
+                <CartItemCard key={item.product._id}>
                   <ItemImage src={item.product.imageUrl} alt={item.product.name} />
                   <ItemInfo>
-                    <div>
-                      <ItemName to={`/product/${item.product._id}`}>{item.product.name}</ItemName>
-                      <ItemPrice>₹{item.product.price.toFixed(2)}</ItemPrice>
-                    </div>
-                    <ItemActions>
-                      <ItemQty>Qty: {item.qty}</ItemQty>
-                      <RemoveButton onClick={() => removeFromCart(item.product._id)}>
-                        <Trash size={16} />
-                      </RemoveButton>
-                    </ItemActions>
+                    <ItemName to={`/product/${item.product._id}`}>
+                      {item.product.name}
+                    </ItemName>
+                    <ItemPrice>₹{item.product.price.toFixed(2)}</ItemPrice>
                   </ItemInfo>
-                </CartItem>
-              ))}
-            </CartItemList>
+                  <ItemQty>Qty: {item.qty}</ItemQty>
+                  <RemoveButton onClick={() => handleRemove(item.product._id)}>
+                    <Trash2 size={20} />
+                  </RemoveButton>
+                </CartItemCard>
+              ))
+            )}
+          </CartItemsList>
 
-            <Summary>
-              <SummaryTitle>Order Summary</SummaryTitle>
-              <SummaryRow>
-                <p>Items ({totalItems})</p>
-                <p>₹{subtotal.toFixed(2)}</p>
-              </SummaryRow>
-              <SummaryRow>
-                <p>Shipping</p>
-                <p>FREE</p>
-              </SummaryRow>
-              <SummaryTotal>
-                <p>Subtotal</p>
-                <p>₹{subtotal.toFixed(2)}</p>
-              </SummaryTotal>
-              
-              <CheckoutButton onClick={checkoutHandler}>
-                Proceed to Checkout
-              </CheckoutButton>
-            </Summary>
-          </CartGrid>
-        )}
+          <CartSummary>
+            <SummaryTitle>Order Summary</SummaryTitle>
+            <SummaryRow>
+              <span>Items ({totalItems})</span>
+              <span>₹{subtotal.toFixed(2)}</span>
+            </SummaryRow>
+            {/* We'll add tax/shipping later */}
+            <SummaryRow style={{ 
+              borderTop: '1px solid var(--color-border)', 
+              paddingTop: '1rem',
+              fontSize: '1.25rem'
+            }}>
+              <span>Total</span>
+              <span>₹{subtotal.toFixed(2)}</span>
+            </SummaryRow>
+            <CheckoutButton 
+              disabled={cartItems.length === 0} 
+              onClick={checkoutHandler}
+            >
+              Proceed to Checkout
+            </CheckoutButton>
+          </CartSummary>
+        </CartGrid>
       </PageWrapper>
     </>
   );

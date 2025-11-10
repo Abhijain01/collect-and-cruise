@@ -1,17 +1,15 @@
-// frontend/src/pages/AdminUpload.tsx
-
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { uploadProduct } from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import { UserInfo } from '../types';
 
-// --- STYLED COMPONENT DEFINITIONS ---
 const FormWrapper = styled.div`
   max-width: 48rem;
   margin: 0 auto;
   padding: 3rem 1.5rem;
+  background-color: var(--color-background);
 `;
 
 const Title = styled.h2`
@@ -26,11 +24,6 @@ const Form = styled.form`
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
-  background-color: var(--color-background-secondary);
-  border: 1px solid var(--color-border);
-  padding: 2rem;
-  border-radius: 0.5rem;
-  
   @media (min-width: 768px) {
     grid-template-columns: 1fr 1fr;
   }
@@ -61,6 +54,7 @@ const InputGroup = styled.div`
   }
   input[type="file"] {
     padding: 0.4rem;
+    background-color: var(--color-background-secondary);
   }
 `;
 
@@ -83,16 +77,23 @@ const SubmitButton = styled.button`
   &:hover {
     background-color: var(--color-primary-hover);
   }
+  &:disabled {
+    background-color: var(--color-text-secondary);
+    cursor: not-allowed;
+  }
 `;
 
+// Use our new semantic theme colors
 const Message = styled.p<{ $error?: boolean }>`
   text-align: center;
   font-size: 0.875rem;
-  color: ${props => props.$error ? 'var(--color-primary)' : '#16a34a'};
+  padding: 1rem;
+  border-radius: 0.375rem;
+  color: ${props => props.$error ? 'var(--color-error)' : 'var(--color-success)'};
+  background-color: ${props => props.$error ? 'var(--color-error-bg)' : 'var(--color-success-bg)'};
   grid-column: 1 / -1;
 `;
 
-// --- COMPONENT LOGIC ---
 const AdminUpload = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -103,15 +104,21 @@ const AdminUpload = () => {
   
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
-  const { userInfo } = useAuth();
 
   useEffect(() => {
-    if (!userInfo || !userInfo.isAdmin) {
+    const userInfoString = localStorage.getItem('userInfo');
+    if (userInfoString) {
+      const userInfo: UserInfo = JSON.parse(userInfoString);
+      if (!userInfo.isAdmin) {
+        navigate('/login');
+      }
+    } else {
       navigate('/login');
     }
-  }, [navigate, userInfo]);
+  }, [navigate]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -127,6 +134,7 @@ const AdminUpload = () => {
     }
     setError('');
     setMessage('');
+    setLoading(true);
 
     const formData = new FormData();
     formData.append('name', name);
@@ -139,7 +147,6 @@ const AdminUpload = () => {
     try {
       await uploadProduct(formData);
       setMessage('Product uploaded successfully!');
-      // Clear form
       setName('');
       setDescription('');
       setCategory('Mainline');
@@ -149,6 +156,8 @@ const AdminUpload = () => {
       (e.target as HTMLFormElement).reset();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Upload failed. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -197,7 +206,9 @@ const AdminUpload = () => {
           {message && <Message>{message}</Message>}
 
           <FullWidthInput>
-            <SubmitButton type="submit">Upload Product</SubmitButton>
+            <SubmitButton type="submit" disabled={loading}>
+              {loading ? 'Uploading...' : 'Upload Product'}
+            </SubmitButton>
           </FullWidthInput>
         </Form>
       </FormWrapper>

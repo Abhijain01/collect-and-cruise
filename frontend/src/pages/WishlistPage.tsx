@@ -1,29 +1,31 @@
-// frontend/src/pages/WishlistPage.tsx
-
-import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { useWishlist } from '../context/WishlistContext';
+import { Helmet } from 'react-helmet-async';
+import { useWishlist } from '../context/WishlistContext'; // Your hook
 import ProductCard from '../components/ProductCard';
+import Loader from '../components/Loader';
+import Message from '../components/Message';
 
-// Use CSS variables
+// --- Styled Components ---
 const PageWrapper = styled.div`
-  background-color: var(--color-background);
-`;
-
-const ContentContainer = styled.div`
   max-width: 1280px;
   margin: 0 auto;
-  padding: 4rem 1rem;
-  @media (min-width: 640px) {
-    padding: 6rem 1.5rem;
+  padding: 2rem 1rem;
+  background-color: var(--color-background);
+  min-height: 60vh;
+
+  @media (min-width: 768px) {
+    padding: 4rem 1rem;
   }
 `;
 
-const SectionTitle = styled.h2`
-  font-size: 1.875rem;
+const Title = styled.h1`
+  font-size: 2.25rem;
   font-weight: 700;
   color: var(--color-text);
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1rem;
 `;
 
 const ProductGrid = styled.div`
@@ -39,17 +41,49 @@ const ProductGrid = styled.div`
   }
 `;
 
-const EmptyMessage = styled.div`
-  text-align: center;
-  padding: 4rem;
-  border: 1px dashed var(--color-border);
-  border-radius: 0.5rem;
-  background-color: var(--color-background-secondary);
-  color: var(--color-text-secondary);
-`;
+// --- COMPONENT ---
 
 const WishlistPage = () => {
-  const { wishlistItems, loading } = useWishlist();
+  // 1. Get the full state from the hook
+  const { wishlist } = useWishlist();
+  const { wishlistItems, loading, error } = wishlist;
+
+  // 2. Render content based on the state
+  const renderContent = () => {
+    // --- THIS IS THE FIX ---
+    // First, check for loading
+    if (loading) {
+      return <Loader />;
+    }
+    
+    // Second, check for errors
+    if (error) {
+      return <Message $error>{error}</Message>;
+    }
+    
+    // Third, check for an empty list
+    // This is Line 64. It is now "safe" to check .length
+    if (wishlistItems.length === 0) {
+      return (
+        <Message>
+          Your wishlist is empty.{' '}
+          <Link to="/shop" style={{ textDecoration: 'underline' }}>
+            Go Shopping
+          </Link>
+        </Message>
+      );
+    }
+    // -----------------------
+    
+    // Finally, render the grid
+    return (
+      <ProductGrid>
+        {wishlistItems.map((product) => (
+          <ProductCard key={product._id} product={product} />
+        ))}
+      </ProductGrid>
+    );
+  };
 
   return (
     <>
@@ -57,25 +91,8 @@ const WishlistPage = () => {
         <title>My Wishlist | Collect and Cruise</title>
       </Helmet>
       <PageWrapper>
-        <ContentContainer>
-          <SectionTitle>My Wishlist</SectionTitle>
-          {loading ? (
-            <p>Loading wishlist...</p>
-          ) : wishlistItems.length === 0 ? (
-            <EmptyMessage>
-              <p>Your wishlist is empty.</p>
-              <Link to="/shop" style={{ color: 'var(--color-primary)', fontWeight: 500, marginTop: '1rem', display: 'inline-block' }}>
-                Find products to save
-              </Link>
-            </EmptyMessage>
-          ) : (
-            <ProductGrid>
-              {wishlistItems.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </ProductGrid>
-          )}
-        </ContentContainer>
+        <Title>My Wishlist</Title>
+        {renderContent()}
       </PageWrapper>
     </>
   );

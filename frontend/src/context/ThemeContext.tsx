@@ -1,51 +1,44 @@
-// frontend/src/context/ThemeContext.tsx
+import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 
-import { createContext, useState, useContext, useMemo, useEffect, type ReactNode } from 'react';
-
-// Define the shape of our theme
-type Theme = 'light' | 'dark';
-
-// Define the shape of our context
+// Define the shape of the context
 interface ThemeContextType {
-  theme: Theme;
+  theme: 'light' | 'dark';
   toggleTheme: () => void;
 }
 
 // Create the context
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// Helper function to get the user's system preference
-const getSystemPreference = (): Theme => {
-  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    return 'dark';
-  }
-  return 'light';
-};
+// Define the props for the provider
+interface ThemeProviderProps {
+  children: ReactNode;
+}
 
-// Create the "Provider" component
-export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
-    // 1. Check localStorage first
-    const storedTheme = localStorage.getItem('theme') as Theme | null;
-    if (storedTheme) {
-      return storedTheme;
-    }
-    // 2. If no storage, check system preference
-    return getSystemPreference();
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    // Get theme from localStorage or default to 'light'
+    const storedTheme = localStorage.getItem('theme');
+    return (storedTheme as 'light' | 'dark') || 'light';
   });
 
-  // This effect updates the <html> tag whenever the theme changes
+  // This effect updates the <html> tag and localStorage
+  // whenever the theme state changes
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    const root = window.document.documentElement;
+    root.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  // The function to change the theme
   const toggleTheme = () => {
     setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
   };
 
-  // We use useMemo to prevent unnecessary re-renders
-  const value = useMemo(() => ({ theme, toggleTheme }), [theme]);
+  // Memoize the context value to prevent unnecessary re-renders
+  const value = useMemo(() => ({
+    theme,
+    toggleTheme,
+  }), [theme]);
 
   return (
     <ThemeContext.Provider value={value}>
@@ -54,7 +47,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Create a simple hook to use the theme context
+// Custom hook to easily use the theme context
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (context === undefined) {

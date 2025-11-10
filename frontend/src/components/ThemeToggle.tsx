@@ -1,22 +1,22 @@
-// frontend/src/components/ThemeToggle.tsx
-
-import { Moon, Sun } from 'lucide-react';
 import styled from 'styled-components';
-import { useTheme } from '../context/ThemeContext';
+import { Sun, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext'; // Import our new hook
 
-// Re-using the IconButton style from Header
 const ToggleButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--color-text-secondary); // Use CSS variable
-  padding: 0.25rem;
+  padding: 0.5rem;
   border-radius: 99px;
-  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary);
+  transition: color 0.2s ease, background-color 0.2s ease;
 
   &:hover {
-    color: var(--color-text); // Use CSS variable
-    background-color: var(--color-background-secondary); // Use CSS variable
+    color: var(--color-text);
+    background-color: var(--color-background-secondary);
   }
 `;
 
@@ -24,7 +24,7 @@ const ThemeToggle = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <ToggleButton onClick={toggleTheme} title={`Activate ${theme === 'light' ? 'dark' : 'light'} mode`}>
+    <ToggleButton onClick={toggleTheme} aria-label="Toggle theme">
       {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
     </ToggleButton>
   );

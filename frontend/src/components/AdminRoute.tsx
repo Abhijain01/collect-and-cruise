@@ -1,21 +1,24 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-//
+import { useAuth } from '../context/AuthContext';
 // --- THIS IS THE FIX ---
-// We add the 'type' keyword because RootState is just a description, not real code.
-import type { RootState } from '../store';
+// We have removed the unused 'Loader' import.
+// -----------------------
 
 const AdminRoute = () => {
-  // Get the user's info from your Redux state
-  const { userInfo } = useSelector((state: RootState) => state.auth);
+  // Get the user info from your AuthContext
+  const { userInfo } = useAuth(); 
 
-  // Check if user is logged in AND is an admin
-  if (userInfo && userInfo.isAdmin) {
-    return <Outlet />; // <-- Show the admin page
-  } else {
-    // 3. If not, redirect to the login page
-    return <Navigate to="/login" replace />;
-  }
+  // We are not checking for a loading state,
+  // so the Loader component is not needed.
+
+  // 1. Check if user is logged in AND is an admin
+  return userInfo && userInfo.isAdmin ? (
+    // 2. If YES, show the child page (e.g., UserListScreen)
+    <Outlet />
+  ) : (
+    // 3. If NO, redirect them to the login page
+    <Navigate to="/login" replace />
+  );
 };
 
 export default AdminRoute;

@@ -1,177 +1,116 @@
-// frontend/src/pages/Home.tsx
-import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { motion } from "framer-motion";
-import { getProducts } from "../services/api";
-import type { Product } from "../types";
-import ProductCard from "../components/ProductCard";
+import { useState, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { getProducts } from '../services/api';
+import type { Product } from '../types';
+import ProductCard from '../components/ProductCard';
 
-// --- HERO SECTION STYLES ---
-const HeroSection = styled.section`
+// Hero Section remains dark, but buttons use theme
+const HeroSection = styled.div`
   position: relative;
+  background-color: #111827;
   color: white;
-  height: 80vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-
   img {
     position: absolute;
     inset: 0;
-    width: 100%;
     height: 100%;
+    width: 100%;
     object-fit: cover;
-    filter: brightness(60%);
   }
-
-  .overlay {
+  div.overlay {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
   }
 `;
 
 const HeroContent = styled.div`
   position: relative;
-  z-index: 10;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 6rem 1rem;
   text-align: center;
-  max-width: 800px;
-  padding: 2rem;
-`;
-
-const HeroTitle = styled(motion.h1)`
-  font-size: 3rem;
-  font-weight: 900;
-  line-height: 1.2;
-  letter-spacing: -0.03em;
-  @media (min-width: 768px) {
-    font-size: 4.5rem;
+  @media (min-width: 640px) {
+    padding: 8rem 1rem;
   }
 `;
 
-const HeroSubtitle = styled(motion.p)`
-  margin-top: 1rem;
+const HeroTitle = styled.h1`
+  font-size: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  @media (min-width: 640px) {
+    font-size: 3.75rem;
+  }
+`;
+
+const HeroSubtitle = styled.p`
+  margin-top: 1.5rem;
   font-size: 1.25rem;
   color: #d1d5db;
-  @media (min-width: 768px) {
-    font-size: 1.5rem;
-  }
 `;
 
 const HeroButton = styled(Link)`
   display: inline-block;
-  margin-top: 2rem;
-  padding: 0.9rem 2.5rem;
+  margin-top: 2.5rem;
+  border-radius: 0.375rem;
+  background-color: var(--color-primary);
+  padding: 0.75rem 2rem;
   font-size: 1rem;
-  border-radius: 999px;
-  background: var(--color-primary);
+  font-weight: 500;
   color: white;
-  font-weight: 600;
-  text-decoration: none;
-  transition: all 0.3s;
+  transition: background-color 0.2s;
   &:hover {
-    background: var(--color-primary-hover);
-    transform: translateY(-2px);
+    background-color: var(--color-primary-hover);
   }
 `;
 
-// --- FEATURED PRODUCTS SECTION ---
+// This section IS themed
 const PageWrapper = styled.div`
   background-color: var(--color-background);
 `;
 
-const ContentContainer = styled.section`
+const ContentContainer = styled.div`
   max-width: 1280px;
   margin: 0 auto;
-  padding: 4rem 1.5rem;
+  padding: 4rem 1rem;
   @media (min-width: 640px) {
-    padding: 6rem 2rem;
+    padding: 6rem 1.5rem;
   }
 `;
 
-const SectionHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-`;
-
 const SectionTitle = styled.h2`
-  font-size: 2rem;
+  font-size: 1.875rem;
   font-weight: 700;
   color: var(--color-text);
 `;
 
-const ViewAllLink = styled(Link)`
-  color: var(--color-primary);
-  font-weight: 500;
-  &:hover {
-    text-decoration: underline;
-  }
-`;
-
-const ProductGrid = styled(motion.div)`
+const ProductGrid = styled.div`
+  margin-top: 1.5rem;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 2rem;
-`;
-
-// --- CATEGORY SECTION ---
-const CategorySection = styled.section`
-  background-color: var(--color-background-secondary);
-  padding: 4rem 1.5rem;
-`;
-
-const CategoryGrid = styled.div`
-  display: grid;
-  gap: 2rem;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-`;
-
-const CategoryCard = styled(motion(Link))`
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  display: block;
-
-  img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: transform 0.4s ease;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  &:hover img {
-    transform: scale(1.05);
-  }
-
-  span {
-    position: absolute;
-    bottom: 1rem;
-    left: 1rem;
-    color: white;
-    font-weight: 700;
-    font-size: 1.2rem;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
   }
 `;
 
 const Home = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
         const { data } = await getProducts();
-        setProducts(data.slice(0, 4));
-      } catch (err) {
-        setError("Failed to load products. Please try again later.");
+        setProducts(data.slice(0, 4)); // Get first 4 for "featured"
+      } catch (error) {
+        console.error("Failed to fetch products", error);
       } finally {
         setLoading(false);
       }
@@ -182,93 +121,34 @@ const Home = () => {
   return (
     <>
       <Helmet>
-        <title>Collect & Cruise — Premium Diecast Cars</title>
-        <meta
-          name="description"
-          content="Shop the finest collectible cars — Mainline, Premium, and Super Treasure Hunt editions. Your passion deserves the best."
-        />
+        <title>Collect and Cruise: Premium Diecast Cars</title>
+        <meta name="description" content="Shop the finest collectible vehicles, from Mainline to Premium. Your cruising adventure starts here." />
       </Helmet>
 
       {/* Hero Section */}
       <HeroSection>
-        <img src="/images/hero-banner.png" alt="Diecast Cars" />
+        <img src="/images/hero-banner.png" alt="HotWheels Collection" />
         <div className="overlay" />
         <HeroContent>
-          <HeroTitle
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            Collect & Cruise 🚗
-          </HeroTitle>
-          <HeroSubtitle
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-          >
-            Discover limited-edition collectibles and classic masterpieces.
-          </HeroSubtitle>
-          <HeroButton to="/shop">Explore Now</HeroButton>
+          <HeroTitle>Collect & Cruise</HeroTitle>
+          <HeroSubtitle>Discover and collect the finest vehicles for your cruising adventures.</HeroSubtitle>
+          <HeroButton to="/shop">Shop All Models</HeroButton>
         </HeroContent>
       </HeroSection>
 
-      {/* Category Highlights */}
-      <CategorySection>
-        <ContentContainer>
-          <SectionTitle>Shop by Category</SectionTitle>
-          <CategoryGrid>
-            {[
-              { name: "Mainline", image: "/images/mainline.jpg" },
-              { name: "Premium", image: "/images/premium.jpg" },
-              { name: "Super Treasure Hunt", image: "/images/treasure.jpg" },
-            ].map((cat, idx) => (
-              <CategoryCard
-                key={idx}
-                to={`/shop?category=${cat.name.toLowerCase()}`}
-                whileHover={{ scale: 1.03 }}
-              >
-                <img src={cat.image} alt={cat.name} loading="lazy" />
-                <span>{cat.name}</span>
-              </CategoryCard>
-            ))}
-          </CategoryGrid>
-        </ContentContainer>
-      </CategorySection>
-
-      {/* Featured Products */}
+      {/* Featured Products Section */}
       <PageWrapper>
         <ContentContainer>
-          <SectionHeader>
-            <SectionTitle>Featured Products</SectionTitle>
-            <ViewAllLink to="/shop">View All →</ViewAllLink>
-          </SectionHeader>
-
-          {loading ? (
-            <p>Loading products...</p>
-          ) : error ? (
-            <p style={{ color: "red" }}>{error}</p>
-          ) : (
-            <ProductGrid
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { staggerChildren: 0.2 } },
-              }}
-            >
-              {products.map((product) => (
-                <motion.div
-                  key={product._id}
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0 },
-                  }}
-                >
-                  <ProductCard product={product} />
-                </motion.div>
-              ))}
-            </ProductGrid>
-          )}
+          <SectionTitle>Featured Products</SectionTitle>
+          <ProductGrid>
+            {loading ? (
+              <p>Loading products...</p>
+            ) : (
+              products.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))
+            )}
+          </ProductGrid>
         </ContentContainer>
       </PageWrapper>
     </>

@@ -4,7 +4,23 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>Collect and Cruise</title>
+
+    <!-- === THIS IS THE FIX (PART 1) === -->
+    <!-- 
+      You MUST replace 'GA_MEASUREMENT_ID' with your own ID (e.g., G-XXXXXXXXXX)
+      You get this from your Google Analytics dashboard.
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    <!-- === END OF FIX === -->
+    
   </head>
   <body>
     <div id="root"></div>

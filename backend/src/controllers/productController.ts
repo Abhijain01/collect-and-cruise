@@ -1,12 +1,25 @@
 import { Request, Response } from 'express';
-import asyncHandler from 'express-async-handler';
+import asyncHandler from '../middleware/asyncHandler.js'; // Your lowercase 'm'
 import Product from '../models/Products.js';
+import { uploader } from '../config/cloudinary.js';
 
-// @desc    Fetch all products
+// @desc    Fetch all products (OR search by keyword)
 // @route   GET /api/products
 // @access  Public
 const getProducts = asyncHandler(async (req: Request, res: Response) => {
-  const products = await Product.find({});
+  // --- THIS IS THE NEW SEARCH LOGIC ---
+  const keyword = req.query.keyword ? {
+    // We search the 'name' field
+    name: {
+      $regex: req.query.keyword, // The search term
+      $options: 'i', // 'i' = case-insensitive
+    },
+  } : {}; // If no keyword, 'keyword' is an empty object
+
+  // This will either find all products ({}) or filtered products
+  const products = await Product.find({ ...keyword });
+  // ------------------------------------
+  
   res.json(products);
 });
 
@@ -15,7 +28,6 @@ const getProducts = asyncHandler(async (req: Request, res: Response) => {
 // @access  Public
 const getProductById = asyncHandler(async (req: Request, res: Response) => {
   const product = await Product.findById(req.params.id);
-
   if (product) {
     res.json(product);
   } else {
@@ -24,67 +36,39 @@ const getProductById = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-// @desc    Create a product
-// @route   POST /api/admin/products
-// @access  Private/Admin
-const createProduct = asyncHandler(async (req: Request, res: Response) => {
-  const product = new Product({
-    name: 'Sample Name',
-    price: 0,
-    imageUrl: '/images/sample.jpg',
-    category: 'Other',
-    stockQuantity: 0,
-    description: 'Sample Description',
-  });
-
-  const createdProduct = await product.save();
-  res.status(201).json(createdProduct);
-});
-
-// @desc    Update a product
-// @route   PUT /api/admin/products/:id
-// @access  Private/Admin
-const updateProduct = asyncHandler(async (req: Request, res: Response) => {
-  const { name, price, description, imageUrl, category, stockQuantity } =
-    req.body;
-
-  const product = await Product.findById(req.params.id);
-
-  if (product) {
-    product.name = name || product.name;
-    product.price = price || product.price;
-    product.description = description || product.description;
-    product.imageUrl = imageUrl || product.imageUrl;
-    product.category = category || product.category;
-    product.stockQuantity = stockQuantity ?? product.stockQuantity;
-
-    const updatedProduct = await product.save();
-    res.json(updatedProduct);
-  } else {
-    res.status(404);
-    throw new Error('Product not found');
+// @desc    Create a new product (Admin only)
+const uploadProduct = asyncHandler(async (req: Request, res: Response) => {
+  const { name, description, category, price, stockQuantity } = req.body;
+  
+  if (!req.file) {
+    res.status(400);
+    throw new Error('No image file uploaded');
   }
-});
 
-// @desc    Delete a product
-// @route   DELETE /api/admin/products/:id
-// @access  Private/Admin
-const deleteProduct = asyncHandler(async (req: Request, res: Response) => {
-  const product = await Product.findById(req.params.id);
-
-  if (product) { // <-- THE FIX IS HERE. The extra '.' is removed.
-    await product.deleteOne();
-    res.json({ message: 'Product removed' });
-  } else {
-    res.status(404);
-    throw new Error('Product not found');
+  try {
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    let dataURI = 'data:' + req.file.mimetype + ';base64,' + b64;
+    const result = await uploader.upload(dataURI, {
+      folder: 'collect-and-cruise',
+    });
+    const product = new Product({
+      name,
+      description,
+      category,
+      price: Number(price),
+      stockQuantity: Number(stockQuantity),
+      imageUrl: result.secure_url,
+    });
+    const createdProduct = await product.save();
+    res.status(201).json(createdProduct);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error uploading image', error });
   }
 });
 
 export {
   getProducts,
   getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
+  uploadProduct
 };

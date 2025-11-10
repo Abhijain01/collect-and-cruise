@@ -1,52 +1,58 @@
-// frontend/src/pages/OrderSuccessPage.tsx
-
-import { Helmet } from 'react-helmet-async';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { Helmet } from 'react-helmet-async';
 import { CheckCircle } from 'lucide-react';
 
-const SuccessWrapper = styled.div`
+// --- Styled Components ---
+const PageWrapper = styled.div`
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 4rem 1rem;
+  background-color: var(--color-background);
+  min-height: 60vh;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 4rem 1rem;
-  text-align: center;
-  background-color: var(--color-background-secondary);
-  border-radius: 0.5rem;
-  margin: 4rem auto;
-  max-width: 600px;
-  border: 1px solid var(--color-border);
+`;
+
+const SuccessIcon = styled(CheckCircle)`
+  color: var(--color-success);
+  width: 80px;
+  height: 80px;
+  stroke-width: 1.5;
 `;
 
 const Title = styled.h1`
-  font-size: 1.875rem;
+  font-size: 2.25rem;
   font-weight: 700;
   color: var(--color-text);
-  margin-top: 1.5rem;
+  margin-top: 2rem;
 `;
 
-const Subtitle = styled.p`
-  font-size: 1rem;
+const Message = styled.p`
+  font-size: 1.125rem;
   color: var(--color-text-secondary);
-  margin-top: 0.5rem;
+  margin-top: 1rem;
+  max-width: 500px;
 `;
 
 const OrderId = styled.p`
-  font-size: 0.875rem;
-  color: var(--color-text-secondary);
-  margin-top: 1rem;
-  code {
-    background-color: var(--color-border);
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    color: var(--color-text);
-  }
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-border);
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  margin-top: 1.5rem;
+  display: inline-block;
 `;
 
 const HomeButton = styled(Link)`
   display: inline-block;
-  margin-top: 2rem;
+  margin-top: 2.5rem;
   border-radius: 0.375rem;
   background-color: var(--color-primary);
   padding: 0.75rem 2rem;
@@ -59,24 +65,28 @@ const HomeButton = styled(Link)`
   }
 `;
 
+// --- COMPONENT ---
+
 const OrderSuccessPage = () => {
-  const [searchParams] = useSearchParams();
-  const orderId = searchParams.get('orderId');
+  const { id: orderId } = useParams();
 
   return (
     <>
-      <Helmet><title>Order Successful! | Collect and Cruise</title></Helmet>
-      <SuccessWrapper>
-        <CheckCircle size={60} color="#16a34a" />
+      <Helmet>
+        <title>Order Confirmed | Collect and Cruise</title>
+      </Helmet>
+      <PageWrapper>
+        <SuccessIcon />
         <Title>Thank you for your order!</Title>
-        <Subtitle>Your mock payment was successful.</Subtitle>
-        {orderId && (
-          <OrderId>
-            Your Order ID is: <code>{orderId}</code>
-          </OrderId>
-        )}
-        <HomeButton to="/">Continue Shopping</HomeButton>
-      </SuccessWrapper>
+        <Message>
+          Your order has been successfully placed. Since this is a "mock" order,
+          no payment was processed, but the order has been saved to your account.
+        </Message>
+        <OrderId>
+          Order ID: {orderId}
+        </OrderId>
+        <HomeButton to="/">Back to Homepage</HomeButton>
+      </PageWrapper>
     </>
   );
 };

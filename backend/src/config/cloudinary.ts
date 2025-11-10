@@ -1,3 +1,4 @@
+// --- FIX 1: 'uploader' is not a named export ---
 import { v2 as cloudinary } from 'cloudinary';
 import dotenv from 'dotenv';
 
@@ -10,7 +11,6 @@ cloudinary.config({
   secure: true,
 });
 
-const { uploader } = cloudinary;
-
-export { uploader };
+// --- FIX 2: Export 'uploader' as a property of cloudinary ---
+export const uploader = cloudinary.uploader;
 export default cloudinary;

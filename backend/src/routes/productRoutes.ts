@@ -1,16 +1,13 @@
-import express from "express";
-import Product from "../models/Products.js";
-
+import express from 'express';
 const router = express.Router();
+// --- FIX: Use lowercase 'm' to match your folder ---
+import { protect, admin } from '../middleware/authMiddleware.js';
+import {
+  getProducts,
+  getProductById,
+} from '../controllers/productController.js';
 
-// ✅ Get all products
-router.get("/", async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch products" });
-  }
-});
+router.route('/').get(getProducts);
+router.route('/:id').get(getProductById);
 
 export default router;
