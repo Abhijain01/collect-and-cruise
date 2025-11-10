@@ -1,30 +1,29 @@
 import { Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
+import Home from './pages/Home';
+import Shop from './pages/Shop';
+import ProductDetail from './pages/ProductDetail';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import styled from 'styled-components';
 
+import CartPage from './pages/CartPage';
+import WishlistPage from './pages/WishlistPage';
+import CheckoutPage from './pages/CheckoutPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import AdminUpload from './pages/AdminUpload';
+
 // --- THIS IS THE FIX ---
-// We are now importing ALL pages from your correct 'pages/' folder
-import Home from './pages/Home.tsx';
-import Shop from './pages/Shop.tsx';
-import ProductDetail from './pages/ProductDetail.tsx';
-import Login from './pages/Login.tsx';
-import Signup from './pages/Signup.tsx';
-import CartPage from './pages/CartPage.tsx';
-import WishlistPage from './pages/WishlistPage.tsx';
-import CheckoutPage from './pages/CheckoutPage.tsx';
-import OrderSuccessPage from './pages/OrderSuccessPage.tsx';
-import AdminUpload from './pages/AdminUpload.tsx';
+// We have removed all the unused admin imports:
+// - AdminRoute
+// - AdminDashboard
+// - UserListScreen
+// - UserEditScreen
 // -----------------------
 
-// We are NOT importing the other admin pages to meet your deadline
-import AdminRoute from './components/AdminRoute.tsx';
-// import AdminDashboard from './pages/AdminDashboard.tsx';
-// import UserListScreen from './pages/admin/UserListScreen.tsx';
-// import UserEditScreen from './pages/admin/UserEditScreen.tsx';
-
-import Chatbot from './components/Chatbot.tsx';
-import RouteChangeTracker from './components/RouteChangeTracker.tsx'; 
+import Chatbot from './components/Chatbot';
+import RouteChangeTracker from './components/RouteChangeTracker'; 
 
 const AppContainer = styled.div`
   display: flex;
@@ -56,15 +55,6 @@ function App() {
           
           {/* Admin Route (We will protect this inside the component) */}
           <Route path="/admin/upload" element={<AdminUpload />} />
-          
-          {/* We are ignoring these routes for the deadline */}
-          {/*
-          <Route path="/admin" element={<AdminRoute />}>
-            <Route index={true} element={<AdminDashboard />} /> 
-            <Route path="userlist" element={<UserListScreen />} />
-            <Route path="user/:id/edit" element={<UserEditScreen />} />
-          </Route>
-          */}
         </Routes>
       </MainContent>
       <Chatbot />
