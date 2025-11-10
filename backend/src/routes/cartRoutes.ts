@@ -1,38 +1,24 @@
-// backend/src/routes/cartRoutes.ts
-
-import express from "express";
-import mongoose from "mongoose";
-import { protect } from "../middleware/authMiddleware";
-import User from "../models/User";
-import Product from "../models/Products";
-
+import express from 'express';
 const router = express.Router();
+import {
+  getCart,
+  addCartItem,
+  removeCartItem
+} from '../controllers/userController.js'; // (This assumes cart logic is in userController)
 
-// 🛒 Add to cart
-router.post("/", protect, async (req: any, res) => {
-  const { productId, qty } = req.body;
-  const user = await User.findById(req.user._id);
-  const product = await Product.findById(productId);
+// --- FIX: Add '.js' to all local imports ---
+import { protect } from '../middleware/authMiddleware.js';
+import User from '../models/User.js';
+import Product from '../models/Products.js';
+// -------------------------------------------
 
-  if (!user || !product) return res.status(404).json({ message: "Not found" });
+// @route   GET /api/cart
+router.get('/', protect, getCart);
 
-  const existing = user.cart.find(
-    (i: any) => i.product.toString() === productId
-  );
+// @route   POST /api/cart
+router.post('/', protect, addCartItem);
 
-  if (existing) {
-    existing.qty += qty;
-  } else {
-    // ✅ Fix applied here
-    user.cart.push({
-      product: product._id as mongoose.Types.ObjectId,
-      qty,
-    });
-  }
-
-  await user.save();
-  await user.populate("cart.product");
-  res.json(user.cart);
-});
+// @route   DELETE /api/cart/:id
+router.delete('/:id', protect, removeCartItem);
 
 export default router;

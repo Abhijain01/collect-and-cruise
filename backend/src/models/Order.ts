@@ -1,34 +1,30 @@
-// backend/src/models/Order.ts
+import mongoose from 'mongoose';
 
-import mongoose, { Document, Model, Schema } from 'mongoose';
-// We will re-use the ICartItem interface from your Products model
-import type { ICartItem } from './Products.js';
+// --- 1. THIS IS THE FIX ---
+// Define the shape of an order item
+const orderItemSchema = new mongoose.Schema({
+  product: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'Product', // Must match your 'Product' model name
+  },
+  qty: {
+    type: Number,
+    required: true,
+  },
+  // We can add name, price, etc. here later
+});
+// -------------------------
 
-// This is the main Order interface
-export interface IOrder extends Document {
-  user: mongoose.Types.ObjectId;
-  orderItems: ICartItem[]; // Re-using the ICartItem interface
-  totalPrice: number;
-  isPaid: boolean;
-  paidAt?: Date;
-}
-
-const orderSchema = new mongoose.Schema<IOrder>({
+const orderSchema = new mongoose.Schema({
   user: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: 'User',
   },
-  orderItems: [
-    {
-      product: {
-        type: Schema.Types.ObjectId,
-        required: true,
-        ref: 'Product',
-      },
-      qty: { type: Number, required: true },
-    }
-  ],
+  // --- 2. USE THE NEW SCHEMA ---
+  orderItems: [orderItemSchema],
+  // -----------------------------
   totalPrice: {
     type: Number,
     required: true,
@@ -42,7 +38,11 @@ const orderSchema = new mongoose.Schema<IOrder>({
   paidAt: {
     type: Date,
   },
-}, { timestamps: true });
+  // (Add other fields like shippingAddress here if needed)
+}, {
+  timestamps: true,
+});
 
-const Order: Model<IOrder> = mongoose.model<IOrder>('Order', orderSchema);
+const Order = mongoose.model('Order', orderSchema);
+
 export default Order;

@@ -1,26 +1,22 @@
 import { Request, Response } from 'express';
-import asyncHandler from 'express-async-handler';
+// --- FIX 1: Import your LOCAL file (with .js) ---
+import asyncHandler from '../middleware/asyncHandler.js';
 import User from '../models/User.js';
-import Order from '../models/Order.js'; // <-- 1. IMPORT THE ORDER MODEL
+import Product from '../models/Products.js';
 
-/**
- * @desc    Get all users
- * @route   GET /api/admin/users
- * @access  Private/Admin
- */
+// @desc    Get all users (Admin only)
+// @route   GET /api/admin/users
+// @access  Private/Admin
 const getUsers = asyncHandler(async (req: Request, res: Response) => {
-  const users = await User.find({});
+  const users = await User.find({}).select('-password');
   res.status(200).json(users);
 });
 
-/**
- * @desc    Get user by ID
- * @route   GET /api/admin/users/:id
- * @access  Private/Admin
- */
+// @desc    Get user by ID (Admin only)
+// @route   GET /api/admin/users/:id
+// @access  Private/Admin
 const getUserById = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.params.id).select('-password');
-
   if (user) {
     res.status(200).json(user);
   } else {
@@ -29,24 +25,21 @@ const getUserById = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @desc    Update user
- * @route   PUT /api/admin/users/:id
- * @access  Private/Admin
- */
+// @desc    Update user (Admin only)
+// @route   PUT /api/admin/users/:id
+// @access  Private/Admin
 const updateUser = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.params.id);
 
   if (user) {
-    user.name = req.body.name || user.name;
+    // --- FIX 2: Use 'email' (from your model) instead of 'name' ---
     user.email = req.body.email || user.email;
     user.isAdmin = Boolean(req.body.isAdmin);
+    // -----------------------------------------------------------
 
     const updatedUser = await user.save();
-
     res.status(200).json({
       _id: updatedUser._id,
-      name: updatedUser.name,
       email: updatedUser.email,
       isAdmin: updatedUser.isAdmin,
     });
@@ -56,39 +49,29 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
   }
 });
 
-/**
- * @desc    Delete a user
- * @route   DELETE /api/admin/users/:id
- * @access  Private/Admin
- */
+// @desc    Delete user (Admin only)
+// @route   DELETE /api/admin/users/:id
+// @access  Private/Admin
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.params.id);
-
   if (user) {
-    await user.deleteOne();
-    res.status(200).json({ message: 'User removed' });
+    if (user.isAdmin) {
+      res.status(400);
+      throw new Error('Cannot delete admin user');
+    }
+    await User.deleteOne({ _id: user._id });
+    res.status(200).json({ message: 'User deleted successfully' });
   } else {
     res.status(404);
     throw new Error('User not found');
   }
 });
 
-// --- 2. ADD THIS NEW FUNCTION ---
-/**
- * @desc    Get all orders
- * @route   GET /api/admin/orders
- * @access  Private/Admin
- */
-const getOrders = asyncHandler(async (req: Request, res: Response) => {
-  // We .populate() to get the user's name from the 'user' collection
-  const orders = await Order.find({}).populate('user', 'id name');
-  res.status(200).json(orders);
-});
+// (Add other admin functions: getProducts, getOrders, etc.)
 
 export {
   getUsers,
   getUserById,
   updateUser,
-  deleteUser,
-  getOrders, // <-- 3. EXPORT THE NEW FUNCTION
+  deleteUser
 };
