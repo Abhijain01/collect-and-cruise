@@ -3,12 +3,11 @@ import type { UserInfo, Product, CartItem, Order } from '../types';
 
 // --- THIS IS THE "PROPER" FIX ---
 //
-// 1. DELETE the old API_URL = '/api'.
-// 2. PASTE the new Railway URL you just copied.
-// 3. Make sure to add '/api' at the end of it.
+// 1. PASTE the new Render URL you just copied.
+// 2. Make sure to add '/api' at the end of it.
 //
-const API_URL = 'https://my-backend-prod.up.railway.app/api'; 
-// (Replace with your real Railway URL!)
+const API_URL = 'https://collect-cruise.onrender.com/api'; 
+// (Replace with your real Render URL!)
 // -----------------------------------------
 
 const api = axios.create({
@@ -56,7 +55,7 @@ export const createMockOrder = () =>
   api.post<Order>('/orders');
 export const hasPurchased = (productId: string) =>
   api.get<{ hasPurchased: boolean }>(`/orders/has-purchased/${productId}`);
-  
+
 // === Admin API (From your structure.txt) ===
 export const uploadProduct = (formData: FormData) => {
   return api.post<Product>('/admin/products', formData, {
