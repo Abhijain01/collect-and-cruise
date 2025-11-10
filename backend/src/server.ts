@@ -23,8 +23,7 @@ const app = express();
 
 // --- THIS IS THE DEPLOYMENT FIX ---
 // This tells your backend to accept requests from your
-// Vercel frontend (which we will create in Step 2).
-// We will set the 'CORS_ORIGIN' variable on Railway.
+// future frontend. We will set 'CORS_ORIGIN' in Render.
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
   credentials: true
@@ -43,7 +42,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 
 // --- We NO LONGER need the "serve frontend" code ---
-// (That was for the old Render plan. Vercel will do this now.)
+// (We will deploy the frontend to Vercel/Netlify, which is better)
 // --------------------------------------------------
 
 // Error Handling Middleware
