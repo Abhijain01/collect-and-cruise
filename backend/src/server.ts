@@ -3,10 +3,8 @@ import dotenv from 'dotenv';
 dotenv.config(); // Must be at the top
 import cookieParser from 'cookie-parser';
 import cors from 'cors'; // Import cors
-import path from 'path';
-import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
-// --- FIX: Use lowercase 'm' (this is the final fix) ---
+// --- FIX: Use lowercase 'm' ---
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Import all your routes
@@ -21,14 +19,14 @@ connectDB();
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// --- THIS IS THE DEPLOYMENT FIX ---
-// This tells your backend to accept requests from your
-// future frontend. We will set 'CORS_ORIGIN' in Render.
+// --- THIS IS THE "1% FIX" ---
+// We are telling your server to ONLY accept requests
+// from your Vercel app (which is in your .env)
 app.use(cors({
   origin: process.env.CORS_ORIGIN,
   credentials: true
 }));
-// ---------------------------------
+// ----------------------------
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -41,9 +39,10 @@ app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 
-// --- We NO LONGER need the "serve frontend" code ---
-// (We will deploy the frontend to Vercel/Netlify, which is better)
-// --------------------------------------------------
+// --- We have REMOVED the 'if (NODE_ENV === "production")' block ---
+// This server is now a 100% pure API.
+// Vercel is handling the frontend.
+// ---------------------------------------------------------------
 
 // Error Handling Middleware
 app.use(notFound);

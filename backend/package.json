@@ -6,9 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node dist/server.js",
-    "build:backend": "tsc",
-    "build:frontend": "cd ../frontend && npm install && npm run build",
-    "build": "npm run build:backend && npm run build:frontend",
+    "build": "tsc",
     "dev": "tsx watch src/server.ts",
     "seeder:import": "tsx seeder.ts",
     "seeder:destroy": "tsx seeder.ts -d"
