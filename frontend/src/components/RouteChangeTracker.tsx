@@ -1,24 +1,26 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-// This component renders nothing.
-// Its only job is to listen to route changes and send them to Google.
+// This component sends page_view events to Google Analytics
+// whenever the user navigates between routes in your SPA
 const RouteChangeTracker = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Check if the Google Analytics 'gtag' function exists
+    // Wait until gtag function is loaded
     if (typeof (window as any).gtag === 'function') {
-      // Send a 'page_view' event
-      (window as any).gtag('event', 'page_view', {
+      (window as any).gtag('config', 'G-P0F7Y2K7G1', {
         page_path: location.pathname + location.search,
         page_location: window.location.href,
-        page_title: document.title, // Send the title from <Helmet>
+        page_title: document.title,
       });
+      console.log('📊 Google Analytics page_view sent:', location.pathname);
+    } else {
+      console.warn('⚠️ gtag not found on window — script may not have loaded yet.');
     }
-  }, [location]); // This effect re-runs every time the 'location' changes
+  }, [location]); // runs every time the route changes
 
-  return null; // This component does not render any HTML
+  return null; // This component renders nothing
 };
 
 export default RouteChangeTracker;

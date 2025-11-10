@@ -8,22 +8,14 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import styled from 'styled-components';
 
+// Page imports
 import CartPage from './pages/CartPage';
 import WishlistPage from './pages/WishlistPage';
 import CheckoutPage from './pages/CheckoutPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import AdminUpload from './pages/AdminUpload';
-
-// --- THIS IS THE FIX ---
-// We have removed all the unused admin imports:
-// - AdminRoute
-// - AdminDashboard
-// - UserListScreen
-// - UserEditScreen
-// -----------------------
-
 import Chatbot from './components/Chatbot';
-import RouteChangeTracker from './components/RouteChangeTracker'; 
+import RouteChangeTracker from './components/RouteChangeTracker'; // ✅ Added
 
 const AppContainer = styled.div`
   display: flex;
@@ -39,7 +31,7 @@ function App() {
   return (
     <AppContainer>
       <Header />
-      <RouteChangeTracker /> {/* For Google Analytics */}
+      <RouteChangeTracker /> {/* ✅ Tracks route changes for Google Analytics */}
       <MainContent>
         <Routes>
           {/* Public Routes */}
@@ -52,8 +44,8 @@ function App() {
           <Route path="/wishlist" element={<WishlistPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/order-success/:id" element={<OrderSuccessPage />} />
-          
-          {/* Admin Route (We will protect this inside the component) */}
+
+          {/* Admin Route */}
           <Route path="/admin/upload" element={<AdminUpload />} />
         </Routes>
       </MainContent>
