@@ -33,15 +33,15 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
 
   if (user) {
     // --- FIX 2: Use 'email' (from your model) instead of 'name' ---
-    user.email = req.body.email || user.email;
-    user.isAdmin = Boolean(req.body.isAdmin);
+    (user as any).email = req.body.email || (user as any).email;
+    (user as any).isAdmin = Boolean(req.body.isAdmin);
     // -----------------------------------------------------------
 
     const updatedUser = await user.save();
     res.status(200).json({
       _id: updatedUser._id,
-      email: updatedUser.email,
-      isAdmin: updatedUser.isAdmin,
+      email: (updatedUser as any).email,
+      isAdmin: (updatedUser as any).isAdmin,
     });
   } else {
     res.status(404);
@@ -55,11 +55,11 @@ const updateUser = asyncHandler(async (req: Request, res: Response) => {
 const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const user = await User.findById(req.params.id);
   if (user) {
-    if (user.isAdmin) {
+    if ((user as any).isAdmin) {
       res.status(400);
       throw new Error('Cannot delete admin user');
     }
-    await User.deleteOne({ _id: user._id });
+    await User.deleteOne({ _id: (user as any)._id });
     res.status(200).json({ message: 'User deleted successfully' });
   } else {
     res.status(404);
