@@ -3,15 +3,10 @@ import type { UserInfo, Product, CartItem, Order } from '../types';
 
 // --- THIS IS THE "PROPER" FIX ---
 //
-// By setting the baseURL to just '/api', we let the Vite proxy
-// (in vite.config.ts) handle the request.
+// We are hard-coding the app to call your LIVE Render URL.
+// This ensures Vercel is not calling '/api' or 'localhost'.
 //
-// - In Development: Vite sees '/api' and forwards it
-//   to 'http://localhost:5000/api'
-//
-// - In Production: (We will set this up later)
-//
-const API_URL = '/api'; 
+const API_URL = 'https://collect-and-cruise.onrender.com/api'; 
 // -----------------------------------------
 
 const api = axios.create({
@@ -62,7 +57,7 @@ export const hasPurchased = (productId: string) =>
   
 // === Admin API (From your structure.txt) ===
 export const uploadProduct = (formData: FormData) => {
-  // This will now be proxied to 'http://localhost:5000/api/admin/products'
+  // This will now call 'https://collect-and-cruise.onrender.com/api/admin/products'
   return api.post<Product>('/admin/products', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
