@@ -8,13 +8,13 @@ import { ToastContainer } from 'react-toastify';
 import { GlobalStyle } from './globalStyles.ts'; 
 import App from './App.tsx';
 
-// --- THIS IS THE FIX ---
+// --- THIS IS THE "PROPER" FIX ---
 // We are importing YOUR Context providers from your file structure
 import { ThemeProvider } from './context/ThemeContext.tsx';
 import { AuthProvider } from './context/AuthContext.tsx';
 import { CartProvider } from './context/CartContext.tsx';
 import { WishlistProvider } from './context/WishlistContext.tsx';
-// -----------------------
+// ----------------------------------
 
 // Import the CSS for react-toastify
 import 'react-toastify/dist/ReactToastify.css';

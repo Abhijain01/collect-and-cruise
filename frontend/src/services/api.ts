@@ -3,18 +3,22 @@ import type { UserInfo, Product, CartItem, Order } from '../types';
 
 // --- THIS IS THE "PROPER" FIX ---
 //
-// 1. PASTE the new Render URL you just copied.
-// 2. Make sure to add '/api' at the end of it.
+// By setting the baseURL to just '/api', we let the Vite proxy
+// (in vite.config.ts) handle the request.
 //
-const API_URL = 'https://collect-cruise.onrender.com/api'; 
-// (Replace with your real Render URL!)
+// - In Development: Vite sees '/api' and forwards it
+//   to 'http://localhost:5000/api'
+//
+// - In Production: (We will set this up later)
+//
+const API_URL = '/api'; 
 // -----------------------------------------
 
 const api = axios.create({
   baseURL: API_URL,
 });
 
-// (The rest of this file is 100% correct)
+// (The interceptor is 100% correct and stays the same)
 api.interceptors.request.use((config) => {
   const userInfoFromStorage = localStorage.getItem('userInfo');
   if (userInfoFromStorage) {
@@ -55,9 +59,10 @@ export const createMockOrder = () =>
   api.post<Order>('/orders');
 export const hasPurchased = (productId: string) =>
   api.get<{ hasPurchased: boolean }>(`/orders/has-purchased/${productId}`);
-
+  
 // === Admin API (From your structure.txt) ===
 export const uploadProduct = (formData: FormData) => {
+  // This will now be proxied to 'http://localhost:5000/api/admin/products'
   return api.post<Product>('/admin/products', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
