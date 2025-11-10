@@ -6,6 +6,7 @@ import cors from 'cors'; // Import cors
 import path from 'path';
 import { fileURLToPath } from 'url';
 import connectDB from './config/db.js';
+// --- FIX: Use lowercase 'm' (this is the final fix) ---
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Import all your routes
@@ -20,7 +21,7 @@ connectDB();
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-// --- THIS IS THE FIX ---
+// --- THIS IS THE DEPLOYMENT FIX ---
 // This tells your backend to accept requests from your
 // Vercel frontend (which we will create in Step 2).
 // We will set the 'CORS_ORIGIN' variable on Railway.
@@ -28,7 +29,7 @@ app.use(cors({
   origin: process.env.CORS_ORIGIN,
   credentials: true
 }));
-// ----------------------
+// ---------------------------------
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
