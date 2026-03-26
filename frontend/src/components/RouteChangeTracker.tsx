@@ -9,7 +9,7 @@ const RouteChangeTracker = () => {
   useEffect(() => {
     // Wait until gtag function is loaded
     if (typeof (window as any).gtag === 'function') {
-      (window as any).gtag('config', 'G-XXXXXXXXXX', {
+      (window as any).gtag('config', 'G-P0F7Y2K7G1', {
         page_path: location.pathname + location.search,
         page_location: window.location.href,
         page_title: document.title,
