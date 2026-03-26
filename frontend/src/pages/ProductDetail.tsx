@@ -8,8 +8,9 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
 import { Heart } from 'lucide-react';
-import Loader from '../components/Loader'; // <-- Import Loader
-import Message from '../components/Message'; // <-- Import Message
+import Loader from '../components/Loader'; 
+import Message from '../components/Message'; 
+import Breadcrumb from '../components/Breadcrumb';
 
 // ... (PageWrapper, Grid, Image, InfoWrapper, Category, Name, Price, etc. are the same) ...
 const PageWrapper = styled.div`
@@ -180,8 +181,69 @@ const ProductDetail = () => {
       <Helmet>
         <title>{product.name} | Collect and Cruise</title>
         <meta name="description" content={product.description} />
+        
+        {/* Product JSON-LD Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": product.imageUrl,
+            "description": product.description,
+            "brand": {
+              "@type": "Brand",
+              "name": product.category
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": window.location.href,
+              "priceCurrency": "INR",
+              "price": product.price,
+              "availability": inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+              "seller": {
+                "@type": "Organization",
+                "name": "Collect and Cruise"
+              }
+            }
+          })}
+        </script>
+
+        {/* BreadcrumbList JSON-LD Schema */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org/",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://collect-and-cruise.vercel.app/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Products",
+                "item": "https://collect-and-cruise.vercel.app/shop"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": product.category,
+                "item": `https://collect-and-cruise.vercel.app/shop?keyword=${encodeURIComponent(product.category)}`
+              },
+              {
+                "@type": "ListItem",
+                "position": 4,
+                "name": product.name,
+                "item": window.location.href
+              }
+            ]
+          })}
+        </script>
       </Helmet>
       <PageWrapper>
+        <Breadcrumb category={product.category} productName={product.name} />
         <Grid>
           <div>
             <Image src={product.imageUrl} alt={`Hot Wheels ${product.name} 1:64 diecast model car`} width="600" height="600" />
