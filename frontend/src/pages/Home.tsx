@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { getProducts } from '../services/api';
@@ -120,10 +120,11 @@ const Home = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Collect and Cruise: Premium Diecast Cars</title>
-        <meta name="description" content="Shop the finest collectible vehicles, from Mainline to Premium. Your cruising adventure starts here." />
-      </Helmet>
+      <SEO 
+        title="Collect and Cruise | Buy Diecast Model Cars & Hot Wheels Online India"
+        description="Shop the finest collectible vehicles online in India, from Mainline to Premium Hot Wheels, Matchbox, and Majorette. Your cruising adventure starts here."
+        keywords="buy hot wheels india, diecast model cars online india"
+      />
 
       {/* Hero Section */}
       <HeroSection>

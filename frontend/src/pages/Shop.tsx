@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
+import SEO from '../components/SEO';
 import { useLocation, Link } from 'react-router-dom'; // Import Link
 import styled from 'styled-components';
 import { getProducts } from '../services/api';
@@ -106,9 +106,11 @@ const Shop = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{keyword ? `Search results for "${keyword}"` : 'Shop All Products'} | Collect and Cruise</title>
-      </Helmet>
+      <SEO 
+        title={keyword ? `Search results for "${keyword}" | Collect and Cruise` : 'Shop Premium & Rare Diecast Cars | Collect and Cruise'}
+        description={keyword ? `Search results for ${keyword} diecast cars at Collect and Cruise.` : 'Browse our wide collection of rare hot wheels cars, hot wheels treasure hunt, and hot wheels premium models online.'}
+        keywords="hot wheels treasure hunt, hot wheels premium, rare hot wheels cars"
+      />
       <PageWrapper>
         <ContentContainer>
           <SectionTitle>
