@@ -140,7 +140,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
       <CardLink to={`/product/${product._id}`}>
         <ImageWrapper>
-          <Image src={product.imageUrl} alt={product.name} />
+          <Image src={product.imageUrl} alt={`Hot Wheels ${product.name} 1:64 diecast model car`} width="300" height="300" loading="lazy" />
         </ImageWrapper>
         <ContentWrapper>
           <TextInfo>

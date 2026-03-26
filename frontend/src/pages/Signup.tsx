@@ -128,7 +128,10 @@ const Signup = () => {
           <img
             style={{ margin: '0 auto', height: '48px', width: 'auto' }}
             src="/images/logo.png"
-            alt="Collect and Cruise"
+            alt="Collect and Cruise Diecast Model Car Store Logo"
+            width="240"
+            height="48"
+            fetchPriority="high"
           />
           <Title>Create your new account</Title>
         </FormContainer>

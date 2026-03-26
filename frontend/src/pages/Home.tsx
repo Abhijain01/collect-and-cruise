@@ -128,7 +128,7 @@ const Home = () => {
 
       {/* Hero Section */}
       <HeroSection>
-        <img src="/images/hero-banner.png" alt="HotWheels Collection" />
+        <img src="/images/hero-banner.png" alt="Hot Wheels 1:64 diecast model car collection" width="1920" height="800" fetchPriority="high" />
         <div className="overlay" />
         <HeroContent>
           <HeroTitle>Collect & Cruise</HeroTitle>

@@ -269,7 +269,7 @@ const Header = () => {
       <HeaderWrapper>
         <Container>
           <LogoLink to="/">
-            <img src="/images/logo.png" alt="Collect and Cruise Logo" style={{ height: '40px', width: 'auto' }} />
+            <img src="/images/logo.png" alt="Collect and Cruise Diecast Model Car Store Logo" style={{ height: '40px', width: 'auto' }} width="200" height="40" fetchPriority="high" />
             <span>Collect & Cruise</span>
           </LogoLink>
 

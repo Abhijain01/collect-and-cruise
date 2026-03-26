@@ -184,7 +184,7 @@ const ProductDetail = () => {
       <PageWrapper>
         <Grid>
           <div>
-            <Image src={product.imageUrl} alt={product.name} />
+            <Image src={product.imageUrl} alt={`Hot Wheels ${product.name} 1:64 diecast model car`} width="600" height="600" />
           </div>
           <InfoWrapper>
             <Category>{product.category}</Category>
