@@ -77,20 +77,23 @@ const Footer = () => {
     <FooterWrapper>
       <Container>
         <Grid>
-          {/* Shop */}
-          <div>
-            <ColumnHeader>Shop</ColumnHeader>
-            <LinkList>
-              <li><FooterLink to="/shop">All Products</FooterLink></li>
-              <li><FooterLink to="/shop?category=Premium">Premium</FooterLink></li>
-              <li><FooterLink to="/shop?category=Mainline">Mainline</FooterLink></li>
-            </LinkList>
+          {/* About Paragraph */}
+          <div style={{ gridColumn: 'span 1' }}>
+            <ColumnHeader>About Us</ColumnHeader>
+            <p style={{ marginTop: '1rem', lineHeight: '1.6', color: '#9ca3af', fontSize: '0.875rem' }}>
+              Collect & Cruise is India's dedicated diecast model car store. We stock Hot Wheels Treasure Hunts, Super Treasure Hunts, Premium models and Majorette cars for collectors across India.
+            </p>
           </div>
-          {/* Company */}
+          {/* Quick Links */}
           <div>
-            <ColumnHeader>Company</ColumnHeader>
+            <ColumnHeader>Quick Links</ColumnHeader>
             <LinkList>
-              <li><FooterLink to="/about">About Us</FooterLink></li>
+              <li><FooterLink to="/">Home</FooterLink></li>
+              <li><FooterLink to="/shop">Shop All Cars</FooterLink></li>
+              <li><FooterLink to="/shop?keyword=Hot+Wheels">Hot Wheels</FooterLink></li>
+              <li><FooterLink to="/shop?keyword=Matchbox">Matchbox</FooterLink></li>
+              <li><FooterLink to="/shop?keyword=Majorette">Majorette</FooterLink></li>
+              <li><FooterLink to="/about">About</FooterLink></li>
               <li><FooterLink to="/contact">Contact</FooterLink></li>
             </LinkList>
           </div>
@@ -132,7 +135,7 @@ const Footer = () => {
           
         </Grid>
         <BottomBar>
-          <p>&copy; {new Date().getFullYear()} Collect & Cruise. All rights reserved.</p>
+          <p>&copy; 2026 Collect and Cruise. All rights reserved.</p>
         </BottomBar>
       </Container>
     </FooterWrapper>

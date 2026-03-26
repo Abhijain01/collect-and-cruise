@@ -276,7 +276,8 @@ const Header = () => {
           {/* --- Desktop Navigation --- */}
           <DesktopNav $isHidden={isSearchOpen}>
             <NavLink to="/">Home</NavLink>
-            <NavLink to="/shop">Shop</NavLink>
+            <NavLink to="/shop">Shop Diecast Cars</NavLink>
+            <NavLink to="/shop?keyword=Treasure+Hunt">Treasure Hunts</NavLink>
             {userInfo && userInfo.isAdmin && (
               <NavLink to="/admin/upload">Admin Upload</NavLink>
             )}
@@ -319,7 +320,8 @@ const Header = () => {
         
         <MobileNavLinks>
           <MobileNavLink to="/">Home</MobileNavLink>
-          <MobileNavLink to="/shop">Shop</MobileNavLink>
+          <MobileNavLink to="/shop">Shop Diecast Cars</MobileNavLink>
+          <MobileNavLink to="/shop?keyword=Treasure+Hunt">Treasure Hunts</MobileNavLink>
           {userInfo && userInfo.isAdmin && (
             <MobileNavLink to="/admin/upload">Admin Upload</MobileNavLink>
           )}

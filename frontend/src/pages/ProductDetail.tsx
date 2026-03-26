@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
-import { getProductById } from '../services/api';
+import { getProductById, getProducts } from '../services/api';
 import type { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,6 +11,7 @@ import { Heart } from 'lucide-react';
 import Loader from '../components/Loader'; 
 import Message from '../components/Message'; 
 import Breadcrumb from '../components/Breadcrumb';
+import ProductCard from '../components/ProductCard';
 
 // ... (PageWrapper, Grid, Image, InfoWrapper, Category, Name, Price, etc. are the same) ...
 const PageWrapper = styled.div`
@@ -129,10 +130,36 @@ const WishlistButton = styled.button<{ $isWishlisted: boolean }>`
 `;
 // ------------------------------------------
 
+const RelatedSection = styled.div`
+  margin-top: 4rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 2rem;
+`;
+
+const SectionTitle = styled.h2`
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 1.5rem;
+`;
+
+const ProductGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  @media (min-width: 640px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  @media (min-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+`;
+
 const ProductDetail = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -143,18 +170,26 @@ const ProductDetail = () => {
 
   useEffect(() => {
     if (!id) return;
-    const fetchProduct = async () => {
+    const fetchProductData = async () => {
       try {
         setLoading(true);
         const { data } = await getProductById(id);
         setProduct(data);
+        
+        try {
+          const { data: relatedData } = await getProducts(data.category);
+          const filtered = relatedData.filter((p: Product) => p._id !== data._id).slice(0, 4);
+          setRelatedProducts(filtered);
+        } catch (e) {
+          console.error("Failed to fetch related products", e);
+        }
       } catch (error) {
         console.error("Failed to fetch product", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchProduct();
+    fetchProductData();
   }, [id]);
 
   const addToCartHandler = () => {
@@ -291,6 +326,17 @@ const ProductDetail = () => {
             
           </InfoWrapper>
         </Grid>
+        
+        {relatedProducts.length > 0 && (
+          <RelatedSection>
+            <SectionTitle>You might also like</SectionTitle>
+            <ProductGrid>
+              {relatedProducts.map(p => (
+                <ProductCard key={p._id} product={p} />
+              ))}
+            </ProductGrid>
+          </RelatedSection>
+        )}
       </PageWrapper>
     </>
   );

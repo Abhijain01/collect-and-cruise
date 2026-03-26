@@ -137,8 +137,35 @@ const Home = () => {
         </HeroContent>
       </HeroSection>
 
-      {/* Featured Products Section */}
       <PageWrapper>
+        {/* Featured Categories Section */}
+        <ContentContainer>
+          <SectionTitle>Featured Categories</SectionTitle>
+          <ProductGrid>
+            <Link to="/shop?keyword=Treasure+Hunt" style={{ textDecoration: 'none' }}>
+              <div style={{ padding: '2rem', backgroundColor: 'var(--color-background-secondary)', borderRadius: '0.5rem', textAlign: 'center', border: '1px solid var(--color-border)', color: 'var(--color-text)', fontWeight: '600' }}>
+                Hot Wheels Treasure Hunts
+              </div>
+            </Link>
+            <Link to="/shop?keyword=Premium" style={{ textDecoration: 'none' }}>
+              <div style={{ padding: '2rem', backgroundColor: 'var(--color-background-secondary)', borderRadius: '0.5rem', textAlign: 'center', border: '1px solid var(--color-border)', color: 'var(--color-text)', fontWeight: '600' }}>
+                Hot Wheels Premium
+              </div>
+            </Link>
+            <Link to="/shop?keyword=Rare" style={{ textDecoration: 'none' }}>
+              <div style={{ padding: '2rem', backgroundColor: 'var(--color-background-secondary)', borderRadius: '0.5rem', textAlign: 'center', border: '1px solid var(--color-border)', color: 'var(--color-text)', fontWeight: '600' }}>
+                Rare & Limited Edition
+              </div>
+            </Link>
+            <Link to="/shop?keyword=New" style={{ textDecoration: 'none' }}>
+              <div style={{ padding: '2rem', backgroundColor: 'var(--color-background-secondary)', borderRadius: '0.5rem', textAlign: 'center', border: '1px solid var(--color-border)', color: 'var(--color-text)', fontWeight: '600' }}>
+                New Arrivals
+              </div>
+            </Link>
+          </ProductGrid>
+        </ContentContainer>
+
+        {/* Featured Products Section */}
         <ContentContainer>
           <SectionTitle>Featured Products</SectionTitle>
           <ProductGrid>
